@@ -41,12 +41,25 @@ macro (disable_preprocessor_switch option_name)
    endif()
 endmacro()
 
+
+if (DLIB_IN_PROJECT_BUILD)
+    # Make sure ENABLE_ASSERTS is defined for debug builds, but only for uses
+    # who are building an application.  If they are just building dlib as a
+    # stand alone library then don't set this because it will conflict with the
+    # settings in config.h if we did.
+    if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
+    set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_ASSERTS" 
+        CACHE STRING "Flags used by the compiler during C++ debug builds." 
+        FORCE)
+    endif ()
+endif()
+
 macro (toggle_preprocessor_switch option_name)
-   if (${option_name})
-      enable_preprocessor_switch(${option_name})
-   else()
-      disable_preprocessor_switch(${option_name})
-   endif()
+if (${option_name})
+    add_global_define(${option_name})
+else()
+    remove_global_define(${option_name})
+endif()
 endmacro()
 
 
@@ -106,7 +119,7 @@ if (NOT TARGET dlib)
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS false)
-      set (ENABLE_ASSERTS true) 
+      set (ENABLE_ASSERTS true)
       enable_preprocessor_switch(ENABLE_ASSERTS)
       disable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
    else()
@@ -338,7 +351,8 @@ if (NOT TARGET dlib)
       endif()
 
       if (DLIB_PNG_SUPPORT)
-         # try to find libpng 
+         # try to find libpng
+         hunter_add_package(PNG)
          find_package(PNG QUIET)
          # Make sure there isn't something wrong with the version of LIBPNG
          # installed on this system.  
@@ -406,7 +420,8 @@ if (NOT TARGET dlib)
       endif()
 
       if (DLIB_JPEG_SUPPORT)
-         # try to find libjpeg 
+         # try to find libjpeg
+         hunter_add_package(Jpeg)
          find_package(JPEG QUIET)
          # Make sure there isn't something wrong with the version of libjpeg 
          # installed on this system.  Also don't use the installed libjpeg
@@ -675,7 +690,7 @@ if (NOT TARGET dlib)
          include_directories(${dlib_needed_includes})
          cuda_add_library(dlib STATIC ${source_files} )
       else()
-         add_library(dlib STATIC ${source_files} )
+          add_library(dlib ${source_files} )
       endif()
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
@@ -686,7 +701,6 @@ if (NOT TARGET dlib)
             add_dependencies(dlib_shared dlib)
          endif()
       endif()
-
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
 
@@ -720,13 +734,12 @@ if (NOT TARGET dlib)
    endif()
 
    # Install the library
-   if (NOT DLIB_IN_PROJECT_BUILD)
+   if(NOT DLIB_IN_PROJECT_BUILD)
+       set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
        cmake_minimum_required(VERSION 2.8.8)
-       if(UNIX)
-           set_target_properties(dlib_shared PROPERTIES
-                                        OUTPUT_NAME dlib 
-                                        VERSION ${VERSION})
-           install(TARGETS dlib dlib_shared
+
+       if(BUILD_SHARED_LIBS)
+           install(TARGETS dlib
                    EXPORT dlib 
                    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows (including cygwin) considers .dll to be runtime artifacts
                    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
