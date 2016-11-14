@@ -27,7 +27,7 @@
 #endif
 
 // figure out if the compiler has rvalue references. 
-#if defined(__clang__) 
+#if defined(__clang__)
 #   if __has_feature(cxx_rvalue_references)
 #       define DLIB_HAS_RVALUE_REFERENCES
 #   endif
