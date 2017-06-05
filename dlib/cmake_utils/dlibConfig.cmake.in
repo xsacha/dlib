@@ -33,4 +33,12 @@ set(dlib_LIBRARIES ${dlib_LIBRARIES} "@dlib_needed_libraries@")
 set(dlib_LIBS      ${dlib_LIBRARIES} "@dlib_needed_libraries@")
 set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
 
-include(@CMAKE_INSTALL_FULL_INCLUDEDIR@/dlib/cmake_utils/use_cpp_11.cmake)
+include(CMakeFindDependencyMacro) 
+
+if("@PNG_FOUND@")
+  find_dependency(PNG CONFIG)
+endif()
+
+if("@JPEG_FOUND@")
+  find_dependency(JPEG CONFIG)
+endif()
