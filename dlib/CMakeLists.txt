@@ -67,9 +67,9 @@ endif()
 
 macro (toggle_preprocessor_switch option_name)
 if (${option_name})
-    add_global_define(${option_name})
+    enable_preprocessor_switch(${option_name})
 else()
-    remove_global_define(${option_name})
+    disable_preprocessor_switch(${option_name})
 endif()
 endmacro()
 
@@ -208,11 +208,7 @@ if (NOT TARGET dlib)
    set(dlib_needed_includes)
 
    if (DLIB_ISO_CPP_ONLY)
-       add_library(dlib STATIC ${source_files} )
-       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
-           add_library(dlib_shared SHARED ${source_files} )
-           add_dependencies(dlib_shared dlib)
-       endif()
+       add_library(dlib ${source_files} )
    else()
 
       set(source_files ${source_files}
@@ -706,18 +702,9 @@ if (NOT TARGET dlib)
          # The old cuda_add_library() command doesn't support CMake's newer dependency
          # stuff, so we have to set the include path manually still, which we do here.
          include_directories(${dlib_needed_includes})
-         cuda_add_library(dlib STATIC ${source_files} )
+         cuda_add_library(dlib ${source_files} )
       else()
           add_library(dlib ${source_files} )
-      endif()
-      if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
-         if (DLIB_USE_CUDA)
-            cuda_add_library(dlib_shared SHARED ${source_files} )
-            add_dependencies(dlib_shared dlib)
-         else()
-            add_library(dlib_shared SHARED ${source_files} )
-            add_dependencies(dlib_shared dlib)
-         endif()
       endif()
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
@@ -732,15 +719,6 @@ if (NOT TARGET dlib)
       target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
    else()
       target_compile_options(dlib PRIVATE ${active_preprocessor_switches})
-   endif()
-   if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
-      target_include_directories(dlib_shared
-                                 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-                                 INTERFACE $<INSTALL_INTERFACE:include>
-                                 PUBLIC ${dlib_needed_includes}
-                                 )
-      target_link_libraries(dlib_shared PUBLIC ${dlib_needed_libraries})
-      target_compile_options(dlib_shared PRIVATE ${active_preprocessor_switches})
    endif()
 
 
