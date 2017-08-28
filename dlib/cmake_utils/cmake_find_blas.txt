@@ -62,28 +62,30 @@ if (UNIX OR MINGW)
         return()
     endif()
 
-    include(CheckTypeSize)
-    check_type_size( "void*" SIZE_OF_VOID_PTR)
+    if(NOT CMAKE_CROSSCOMPILING)
+        include(CheckTypeSize)
+        check_type_size( "void*" SIZE_OF_VOID_PTR)
 
-    if (SIZE_OF_VOID_PTR EQUAL 8)
-        set( mkl_search_path
-            /opt/intel/mkl/*/lib/em64t
-            /opt/intel/mkl/lib/intel64
-            /opt/intel/lib/intel64
+        if (SIZE_OF_VOID_PTR EQUAL 8)
+            set( mkl_search_path
+                /opt/intel/mkl/*/lib/em64t
+                /opt/intel/mkl/lib/intel64
+                /opt/intel/lib/intel64
             )
 
-        find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
-        mark_as_advanced(mkl_intel)
-    else()
-        set( mkl_search_path
-            /opt/intel/mkl/*/lib/32
-            /opt/intel/mkl/lib/ia32
-            /opt/intel/lib/ia32
+            find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
+            mark_as_advanced(mkl_intel)
+        else()
+            set( mkl_search_path
+                /opt/intel/mkl/*/lib/32
+                /opt/intel/mkl/lib/ia32
+                /opt/intel/lib/ia32
             )
 
-        find_library(mkl_intel mkl_intel ${mkl_search_path})
-        mark_as_advanced(mkl_intel)
-    endif()
+            find_library(mkl_intel mkl_intel ${mkl_search_path})
+            mark_as_advanced(mkl_intel)
+        endif()
+    endif()`
 
    include(CheckLibraryExists)
 
