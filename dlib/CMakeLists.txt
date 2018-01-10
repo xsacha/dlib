@@ -724,17 +724,59 @@ if (NOT TARGET dlib)
       target_compile_options(dlib_shared PUBLIC ${active_compile_opts})
    endif()
 
+   # Installation (https://github.com/forexample/package-example) {
+
+   set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+   set(include_install_dir "include")
+
+   set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+   set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+   set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+   set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+   set(namespace "${PROJECT_NAME}::")
+
+   include(CMakePackageConfigHelpers)
+
+   # Use:
+   #   * PROJECT_VERSION
+   write_basic_package_version_file(
+       "${version_config}" COMPATIBILITY SameMajorVersion
+   )
+
+   # Use variables:
+   #   * TARGETS_EXPORT_NAME
+   #   * PROJECT_NAME
+   configure_package_config_file(
+       "${CMAKE_CURRENT_LIST_DIR}/../cmake/Config.cmake.in"
+       "${project_config}"
+       INSTALL_DESTINATION "${config_install_dir}"
+   )
+
+   install(
+       FILES "${project_config}" "${version_config}"
+       DESTINATION "${config_install_dir}"
+   )
+
+   install(
+       EXPORT "${TARGETS_EXPORT_NAME}"
+       NAMESPACE "${namespace}"
+       DESTINATION "${config_install_dir}"
+   )
+
+   # }
+
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
        if(UNIX)
            install(TARGETS dlib
-                   EXPORT dlib 
+                   EXPORT ${TARGETS_EXPORT_NAME}
                    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows (including cygwin) considers .dll to be runtime artifacts
                    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
                    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
        else()
            install(TARGETS dlib
-                   EXPORT dlib 
+                   EXPORT ${TARGETS_EXPORT_NAME}
                    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
                    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
                    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -751,27 +793,6 @@ if (NOT TARGET dlib)
 
        configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
-
-       ## Config.cmake generation and installation
-
-       set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
-       install(EXPORT dlib
-            NAMESPACE dlib::
-            DESTINATION ${ConfigPackageLocation})
-
-       configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
-
-       include(CMakePackageConfigHelpers)
-       write_basic_package_version_file(
-           "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
-           VERSION ${VERSION}
-           COMPATIBILITY AnyNewerVersion
-           )
-
-       install(FILES 
-                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
-                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
-               DESTINATION ${ConfigPackageLocation})
 
        ## dlib-1.pc generation and installation
 
