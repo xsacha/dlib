@@ -22,6 +22,7 @@ project(dlib VERSION 19.8)
 
 
 
+option(DLIB_HEADER_ONLY "dlib header only" OFF)
 
 get_directory_property(has_parent PARENT_DIRECTORY)
 if(NOT has_parent)

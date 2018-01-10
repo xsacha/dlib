@@ -221,6 +221,13 @@ if (NOT TARGET dlib)
    set(dlib_needed_libraries)
    set(dlib_needed_includes)
 
+   if(DLIB_HEADER_ONLY)
+       add_library(dlib INTERFACE)
+       set(dlib_keyword INTERFACE)
+   else()
+       set(dlib_keyword PUBLIC)
+   endif()
+
    if (DLIB_ISO_CPP_ONLY)
       add_library(dlib ${source_files} )
    else()
@@ -724,22 +731,22 @@ if (NOT TARGET dlib)
          # stuff, so we have to set the include path manually still, which we do here.
          include_directories(${dlib_needed_includes})
          cuda_add_library(dlib ${source_files} )
-      else()
-         add_library(dlib ${source_files} )
+
+      elseif(NOT DLIB_HEADER_ONLY)
+          add_library(dlib ${source_files} )
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
 
    target_include_directories(dlib
-      INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-      INTERFACE $<INSTALL_INTERFACE:include>
-      PUBLIC ${dlib_needed_includes}
-      )
-   target_link_libraries(dlib PUBLIC ${dlib_needed_libraries})
+                              INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                              INTERFACE $<INSTALL_INTERFACE:include>
+                              ${dlib_keyword} ${dlib_needed_includes}
+                              )
    if (DLIB_IN_PROJECT_BUILD)
-      target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
-   else()
+      target_compile_options(dlib ${dlib_keyword} ${active_preprocessor_switches})
+   elseif(NOT DLIB_HEADER_ONLY)
       # These are private in this case because they will be controlled by the
       # contents of dlib/config.h once it's installed. But for in project
       # builds, there is no real config.h so they are public in the above case.
@@ -768,7 +775,7 @@ if (NOT TARGET dlib)
 
    if (TARGET dlib)
       enable_cpp11_for_target(dlib)
-      target_compile_options(dlib PUBLIC ${active_compile_opts})
+      target_compile_options(dlib ${dlib_keyword} ${active_compile_opts})
    endif()
 
    # Installation (https://github.com/forexample/package-example) {
