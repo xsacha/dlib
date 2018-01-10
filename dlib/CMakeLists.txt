@@ -4,8 +4,8 @@
 #
 
 
-cmake_minimum_required(VERSION 2.8.12)
-project(dlib)
+cmake_minimum_required(VERSION 3.2)
+project(dlib VERSION 19.8)
 
 
 include(cmake_utils/set_compiler_specific_options.cmake)
