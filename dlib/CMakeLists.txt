@@ -16,7 +16,6 @@ include(GNUInstallDirs)
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
-include(cmake_utils/use_cpp_11.cmake)
 
 
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
@@ -770,11 +769,9 @@ if (NOT TARGET dlib)
       add_library(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
       target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
-      enable_cpp11_for_target(dlib_all_source_cpp)
    endif()
 
    if (TARGET dlib)
-      enable_cpp11_for_target(dlib)
       target_compile_options(dlib ${dlib_keyword} ${active_compile_opts})
    endif()
 
