@@ -697,7 +697,6 @@ if (NOT TARGET dlib)
    target_include_directories(dlib
                               INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
                               INTERFACE $<INSTALL_INTERFACE:include>
-                              PUBLIC ${dlib_needed_includes}
                               )
    target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
    if (DLIB_IN_PROJECT_BUILD)
