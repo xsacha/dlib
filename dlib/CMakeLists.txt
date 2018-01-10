@@ -694,16 +694,9 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_LINK_WITH_SQLITE3)
-         find_library(sqlite sqlite3)
-         # make sure sqlite3.h is in the include path
-         find_path(sqlite_path sqlite3.h)
-         if (sqlite AND sqlite_path)
-            set(dlib_needed_includes ${dlib_needed_includes} ${sqlite_path})
-            set(dlib_needed_libraries ${dlib_needed_libraries} ${sqlite} )
-         else()
-            set(DLIB_LINK_WITH_SQLITE3 OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
-         endif()
-         mark_as_advanced(sqlite sqlite_path)
+         hunter_add_package(sqlite3)
+         find_package(sqlite3 CONFIG REQUIRED)
+         set(dlib_needed_libraries ${dlib_needed_libraries} sqlite3::sqlite3)
       endif()
 
 
