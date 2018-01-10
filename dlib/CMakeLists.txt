@@ -347,67 +347,9 @@ if (NOT TARGET dlib)
       endif()
 
       if (DLIB_PNG_SUPPORT)
-         # try to find libpng 
-         find_package(PNG QUIET)
-         # Make sure there isn't something wrong with the version of LIBPNG
-         # installed on this system.  
-         if (PNG_FOUND)
-            set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARIES})
-            CHECK_FUNCTION_EXISTS(png_create_read_struct LIBPNG_IS_GOOD)
-         endif()
-         if (PNG_FOUND AND LIBPNG_IS_GOOD)
-            include_directories(${PNG_INCLUDE_DIR})
-            set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARIES})
-            set(REQUIRES_LIBS " libpng")
-         else()
-            # If we can't find libpng then statically compile it in.
-            include_directories(external/libpng external/zlib)
-            set(source_files ${source_files}
-               external/libpng/png.c
-               external/libpng/pngerror.c
-               external/libpng/pngget.c
-               external/libpng/pngmem.c
-               external/libpng/pngpread.c
-               external/libpng/pngread.c
-               external/libpng/pngrio.c
-               external/libpng/pngrtran.c
-               external/libpng/pngrutil.c
-               external/libpng/pngset.c
-               external/libpng/pngtrans.c
-               external/libpng/pngwio.c
-               external/libpng/pngwrite.c
-               external/libpng/pngwtran.c
-               external/libpng/pngwutil.c
-               external/zlib/adler32.c
-               external/zlib/compress.c
-               external/zlib/crc32.c
-               external/zlib/deflate.c
-               external/zlib/gzclose.c
-               external/zlib/gzlib.c
-               external/zlib/gzread.c
-               external/zlib/gzwrite.c
-               external/zlib/infback.c
-               external/zlib/inffast.c
-               external/zlib/inflate.c
-               external/zlib/inftrees.c
-               external/zlib/trees.c
-               external/zlib/uncompr.c
-               external/zlib/zutil.c
-               )
-
-            include(cmake_utils/check_if_neon_available.cmake)
-            if (ARM_NEON_IS_AVAILABLE)
-               message (STATUS "NEON instructions will be used for libpng.")
-               enable_language(ASM)
-               set(source_files ${source_files}
-                  external/libpng/arm/arm_init.c
-                  external/libpng/arm/filter_neon_intrinsics.c
-                  external/libpng/arm/filter_neon.S
-                  )
-               set_source_files_properties(external/libpng/arm/filter_neon.S PROPERTIES COMPILE_FLAGS "${CMAKE_ASM_FLAGS} ${CMAKE_CXX_FLAGS} -x assembler-with-cpp")
-            endif()
-            set(REQUIRES_LIBS "")
-         endif()
+         hunter_add_package(PNG)
+         find_package(PNG CONFIG REQUIRED)
+         list(APPEND dlib_needed_libraries PNG::png)
          set(source_files ${source_files}
             image_loader/png_loader.cpp
             image_saver/save_png.cpp
