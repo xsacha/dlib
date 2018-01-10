@@ -1,6 +1,16 @@
-cmake_minimum_required(VERSION 2.8.12)
+# Copyright (C) 2015-2018 Ruslan Baratov
+# License: Boost Software License
+# See LICENSE.txt for the full license.
 
+cmake_minimum_required(VERSION 3.2)
 
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.19.84.tar.gz"
+    SHA1 "9086d4b3c32784effdd6f83f45125b55cf95aae8"
+)
+
+project(dlib VERSION 19.8)
 
 
 #############################################################################
