@@ -457,9 +457,7 @@ if (NOT TARGET dlib)
                                          "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
                                          "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
 
-               if (NOT MSVC) # see https://github.com/davisking/dlib/issues/363
-                  list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
-               endif()
+               list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
 
                try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
                            ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
