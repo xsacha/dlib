@@ -76,6 +76,7 @@ if (UNIX OR MINGW)
       return()
    endif()
 
+   if (NOT CMAKE_CROSSCOMPILING)
    include(CheckTypeSize)
    check_type_size( "void*" SIZE_OF_VOID_PTR)
 
@@ -98,6 +99,8 @@ if (UNIX OR MINGW)
 
       find_library(mkl_intel mkl_intel ${mkl_search_path})
       mark_as_advanced(mkl_intel)
+   endif()
+
    endif()
 
    include(CheckLibraryExists)
@@ -169,7 +172,14 @@ if (UNIX OR MINGW)
    INCLUDE (CheckFunctionExists)
 
    if (NOT blas_found)
-      find_library(cblas_lib openblas PATHS ${extra_paths})
+      # Hunter OpenBLAS not supported on these hosts/platforms for 0.2.20 or lower
+      if (IOS OR CMAKE_HOST_WIN32 OR WIN32)
+         find_library(cblas_lib openblas PATHS ${extra_paths})
+      else()
+          hunter_add_package(OpenBLAS)
+          find_package(OpenBLAS CONFIG REQUIRED)
+          set(cblas_lib OpenBLAS::OpenBLAS)
+      endif()
       if (cblas_lib)
          set(blas_libraries ${cblas_lib})
          set(blas_found 1)

@@ -47,14 +47,6 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/@TARGETS_EXPORT_NAME@.cmake")
 check_required_components("@PROJECT_NAME@")
 
- 
-# Our library dependencies (contains definitions for IMPORTED targets)
-if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
-   # Compute paths
-   get_filename_component(dlib_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-   include("${dlib_CMAKE_DIR}/dlib.cmake")
-endif()
-
 set(dlib_LIBRARIES dlib::dlib)
 set(dlib_LIBS      dlib::dlib)
 set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
