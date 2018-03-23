@@ -612,6 +612,7 @@ if (NOT TARGET dlib)
                               INTERFACE $<INSTALL_INTERFACE:include>
                               ${dlib_keyword} ${dlib_needed_includes}
                               )
+   target_link_libraries(dlib PUBLIC ${dlib_needed_libraries})
    if (DLIB_IN_PROJECT_BUILD)
       target_compile_options(dlib ${dlib_keyword} ${active_preprocessor_switches})
    elseif(NOT DLIB_HEADER_ONLY)
