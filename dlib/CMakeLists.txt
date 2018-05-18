@@ -16,6 +16,7 @@ include(GNUInstallDirs)
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
+include(CMakePackageConfigHelpers)
 
 
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
@@ -676,7 +677,7 @@ if (NOT TARGET dlib)
          NAMESPACE dlib::
          DESTINATION ${ConfigPackageLocation})
 
-      configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
+      configure_package_config_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" INSTALL_DESTINATION lib/cmake/dlib)
 
       include(CMakePackageConfigHelpers)
       write_basic_package_version_file(
