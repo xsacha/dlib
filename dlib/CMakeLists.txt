@@ -5,7 +5,7 @@
 
 
 cmake_minimum_required(VERSION 3.2)
-project(dlib VERSION 19.8)
+project(dlib)
 
 
 include(cmake_utils/set_compiler_specific_options.cmake)
@@ -464,6 +464,7 @@ if (NOT TARGET dlib)
             # linux).
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
             list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
+            LIST(APPEND CUDA_NVCC_FLAGS -DDLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
             if (NOT MSVC)
                list(APPEND CUDA_NVCC_FLAGS "-std=c++11")
             endif()
