@@ -360,7 +360,7 @@ if (NOT TARGET dlib)
       else () ##################################################################################
          # link to the nsl library if it exists.  this is something you need sometimes 
          find_library(nsllib nsl)
-         if (nsllib)
+         if (nsllib AND NOT ANDROID)
             set (dlib_needed_libraries ${dlib_needed_libraries} ${nsllib})
          endif ()
 
