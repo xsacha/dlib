@@ -1,4 +1,12 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.2)
+
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.22.3.tar.gz"
+    SHA1 "46089aabb7c8cc181a70a7a61699f526c116cedf"
+)
+
+project(dlib VERSION 19.14)
 
 
 
@@ -11,7 +19,7 @@ cmake_minimum_required(VERSION 2.8.12)
 
 
 
-
+option(DLIB_HEADER_ONLY "dlib header only" OFF)
 
 get_directory_property(has_parent PARENT_DIRECTORY)
 if(NOT has_parent)
