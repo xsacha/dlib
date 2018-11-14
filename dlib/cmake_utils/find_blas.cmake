@@ -108,6 +108,7 @@ if (UNIX OR MINGW)
    set(mkl_include_search_path
       /opt/intel/mkl/include
       /opt/intel/include
+      "C:/.hunter/_Base/69d3733/0a71db5/e3d2723/Install"
       )
    find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
    mark_as_advanced(mkl_include_dir)
@@ -148,7 +149,7 @@ if (UNIX OR MINGW)
          mark_as_advanced(mkl_thread mkl_iomp mkl_pthread)
          list(APPEND mkl_libs ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
       endif()
-   
+
       # If we found the MKL 
       if (mkl_intel AND mkl_core AND ((mkl_thread AND mkl_iomp AND mkl_pthread) OR mkl_sequential))
          set(mkl_libraries ${mkl_libs})
@@ -319,30 +320,41 @@ elseif(WIN32 AND NOT MINGW)
       find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
    endif()
 
+   find_library(mklml_intel NAMES mklml_intel mklml PATHS "C:/.hunter/_Base/69d3733/0a71db5/e3d2723/Install" ${mkl_search_path})
+   mark_as_advanced(mklml_intel)
+   message(STATUS "Found Intel MKLML")
+
    INCLUDE (CheckFunctionExists)
 
-   # Search for the needed libraries from the MKL.  
-   find_library(mkl_core mkl_core ${mkl_search_path})
-   set(mkl_libs ${mkl_intel} ${mkl_core})
-   mark_as_advanced(mkl_libs mkl_intel mkl_core)
-   if (DLIB_USE_MKL_SEQUENTIAL)
-     find_library(mkl_sequential mkl_sequential ${mkl_search_path})
-     mark_as_advanced(mkl_sequential)
-     list(APPEND mkl_libs ${mkl_sequential})
+   # Search for the needed libraries from the MKL.
+   if (mklml_intel)
+     find_library(mkl_iomp libiomp5md PATHS "C:/.hunter/_Base/69d3733/0a71db5/e3d2723/Install" ${mkl_search_path})
+     set(mkl_libs ${mklml_intel} ${mkl_iomp})
+     mark_as_advanced(mkl_libs mkl_iomp)
    else()
-     find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
-     find_library(mkl_iomp libiomp5md ${mkl_search_path})
-     mark_as_advanced(mkl_thread mkl_iomp)
-     list(APPEND mkl_libs ${mkl_thread} ${mkl_iomp})
+    find_library(mkl_core mkl_core ${mkl_search_path})
+    set(mkl_libs ${mkl_intel} ${mkl_core})
+    mark_as_advanced(mkl_libs mkl_intel mkl_core)
+    if (DLIB_USE_MKL_SEQUENTIAL)
+      find_library(mkl_sequential mkl_sequential ${mkl_search_path})
+      mark_as_advanced(mkl_sequential)
+      list(APPEND mkl_libs ${mkl_sequential})
+    else()
+      find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+      find_library(mkl_iomp libiomp5md ${mkl_search_path})
+      mark_as_advanced(mkl_thread mkl_iomp)
+      list(APPEND mkl_libs ${mkl_thread} ${mkl_iomp})
+    endif()
    endif()
 
    # If we found the MKL 
-   if (mkl_intel AND mkl_core AND ((mkl_thread AND mkl_iomp) OR mkl_sequential))
+   if (mklml_intel OR (mkl_intel AND mkl_core AND ((mkl_thread AND mkl_iomp) OR mkl_sequential)))
       set(blas_libraries ${mkl_libs})
       set(lapack_libraries ${mkl_libs})
       set(blas_found 1)
       set(lapack_found 1)
       message(STATUS "Found Intel MKL BLAS/LAPACK library")
+      message(STATUS "BLAS LIBS: ${blas_libraries}")
 
       # Make sure the version of the Intel MKL we found is compatible with
       # the compiler we are using.  One way to do this check is to see if we can
@@ -351,8 +363,8 @@ elseif(WIN32 AND NOT MINGW)
       CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
       if (NOT HAVE_CBLAS)
          message("BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
-         set(blas_found 0)
-         set(lapack_found 0)
+         #set(blas_found 0)
+         #set(lapack_found 0)
       endif()
    endif()
 endif()
